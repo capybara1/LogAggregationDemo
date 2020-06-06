@@ -1,0 +1,18 @@
+_format_version: "1.1"
+
+services:
+  - name: demo-app
+    url: http://app
+    plugins:
+      - name: correlation-id
+        config:
+          header_name: X-Correlation-Id
+          echo_downstream: true
+      - name: tcp-log
+        config:
+          host: logstash
+          port: 5000
+    routes:
+      - name: default
+        paths:
+          - /

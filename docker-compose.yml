@@ -1,0 +1,58 @@
+version: '3.2'
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: log_aggregation_demo_elasticsearch
+    volumes:
+      - './config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro'
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: elastic
+      discovery.type: single-node
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.6.2
+    container_name: log_aggregation_demo_logstash
+    volumes:
+      - './config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro'
+      - './pipeline/default.conf:/usr/share/logstash/pipeline/default.conf:ro'
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.2
+    container_name: log_aggregation_demo_kibana
+    volumes:
+      - './config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro'
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  app:
+    build:
+      context: app
+    image: local/log-aggregation-demo-app
+    container_name: log_aggregation_demo_app
+    depends_on:
+      - logstash
+
+  kong:
+    image: kong:2.0
+    container_name: log_aggregation_demo_kong
+    volumes:
+      - './config/kong.yml:/usr/local/kong/declarative/kong.yml:ro'
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8000
+    depends_on:
+      - app
