@@ -9,13 +9,16 @@ Elastic Search data is visualized by Kibana.
    ```sh
    docker-compose up -d
    ```
-2. ISsue requests using curl, e.g.
+2. Wait until all services have completed their initialization
+3. Issue requests using curl, e.g.
    ```sh
    docker exec log_aggregation_demo_app curl -sS -X PUT -H 'Content-Type: application/json;charset=utf-8' -d '{"state":"This is the new state"}' kong:8000
    docker exec log_aggregation_demo_app curl -sS -H "Accept: application/json;charset=utf-8" kong:8000
    ```
-3. On the docker host open a web browser and navigate to <http://localhost:5601/>
-4. Cleanup
+4. On the docker host open a web browser and navigate to <http://localhost:5601/>
+5. Add an _index template_ using the _index pattern_ `logstash-*`
+6. Explore
+7. Cleanup
    ```sh
    docker-compose down
    ```

@@ -17,7 +17,9 @@ services:
     container_name: log_aggregation_demo_logstash
     volumes:
       - './config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro'
+      - './config/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro'
       - './pipeline/default.conf:/usr/share/logstash/pipeline/default.conf:ro'
+      - './pipeline/kong.conf:/usr/share/logstash/pipeline/kong.conf:ro'
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     depends_on:

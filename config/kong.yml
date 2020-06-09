@@ -11,7 +11,7 @@ services:
       - name: tcp-log
         config:
           host: logstash
-          port: 5000
+          port: 5001
     routes:
       - name: default
         paths:
